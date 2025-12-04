@@ -120,7 +120,7 @@ def novo_jogo(quantidadeJog: int = Query(..., ge=2, le=10)):
     
     return {"id_jogo": game_id}
 
-### Parte 2: Verificar Status do Jogo
+# Parte 2: Verificar Status do Jogo
 
 @app.get("/jogo/{id_jogo}/status")
 def status_do_jogo(id_jogo: int):
@@ -238,3 +238,4 @@ def passar_a_vez(id_jogo: int, id_jogador: int):
         "nova_carta_comprada": new_card
 
     }
+
