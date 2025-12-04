@@ -3,7 +3,7 @@
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.109+-009688?style=for-the-badge&logo=fastapi&logoColor=white)
 ![Uvicorn](https://img.shields.io/badge/Uvicorn-ASGI-4051B5?style=for-the-badge&logo=uvicorn&logoColor=white)
 ![Pytest](https://img.shields.io/badge/Pytest-Tests-red?style=for-the-badge&logo=pytest&logoColor=white)
-![Status](https://img.shields.io/badge/Status-Concluído-success?style=for-the-badge)
+
 
 Projeto acadêmico de Back-end para um jogo de cartas estilo UNO, desenvolvido com **FastAPI**.
 O objetivo principal deste projeto foi a aplicação prática de **Padrões de Projeto (Design Patterns)** de Engenharia de Software em um cenário real.
