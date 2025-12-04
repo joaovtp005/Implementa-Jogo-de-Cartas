@@ -26,7 +26,7 @@ class Game(BaseModel):
 
 # 2. Lógica do Jogo (Funções Auxiliares) 
 
-# Cores e valores (sem cartas especiais, como pedido)
+# Cores e valores
 COLORS = ['vermelho', 'azul', 'verde', 'amarelo']
 VALUES = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
 
@@ -83,7 +83,7 @@ def get_game(id_jogo: int) -> Game:
 
 #  4. Endpoints da API (Rotas) 
 
-### Parte 1: Preparação
+#Parte 1: Preparação
 
 @app.get("/novoJogo", status_code=status.HTTP_201_CREATED)
 def novo_jogo(quantidadeJog: int = Query(..., ge=2, le=10)):
@@ -162,7 +162,7 @@ def ver_cartas(id_jogo: int, id_jogador: int):
 
 
 
-### Parte 3: Rodada
+# Parte 3: Rodada
 
 @app.put("/jogo/{id_jogo}/jogar")
 def jogar_carta(id_jogo: int, id_jogador: int, id_carta: int = Query(..., ge=0)):
@@ -236,4 +236,5 @@ def passar_a_vez(id_jogo: int, id_jogador: int):
     return {
         "message": f"Você comprou uma carta. Próximo jogador: {game.current_player_id}",
         "nova_carta_comprada": new_card
+
     }
