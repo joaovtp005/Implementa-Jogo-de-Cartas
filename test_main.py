@@ -16,19 +16,19 @@ def setup_client():
     observer.partidas_iniciadas = 0
     observer.partidas_finalizadas = 0
     
-    # <--- CORREÇÃO AQUI: Resetamos a variável DENTRO do módulo 'main'
+    
     main.next_game_id = 0 
     
-    yield # Aqui é onde o teste é executado
+    yield 
 
-    # Limpa o estado depois do teste (garantia)
+    # Limpa o estado depois do teste 
     games_db.clear()
     observer.partidas_iniciadas = 0
     observer.partidas_finalizadas = 0
     main.next_game_id = 0
 
 
-### Testes dos Endpoints Principais
+# Testes dos Endpoints Principais
 
 def test_novo_jogo_sucesso():
     """Testa a criação de um novo jogo com 2 jogadores."""
@@ -41,7 +41,7 @@ def test_novo_jogo_sucesso():
     assert 0 in games_db
     game = games_db[0]
     assert len(game.players) == 2
-    assert len(game.players[0].hand) == 5 # 5 cartas por jogador
+    assert len(game.players[0].hand) == 5 
     assert len(game.players[1].hand) == 5
     
     
@@ -55,7 +55,7 @@ def test_novo_jogo_falha_jogadores():
     """Testa os limites de jogadores (mínimo 2, máximo 10)."""
     # Teste abaixo do limite
     response_min = client.get("/novoJogo?quantidadeJog=1")
-    assert response_min.status_code == 422 # Unprocessable Entity
+    assert response_min.status_code == 422 
     
     # Teste acima do limite
     response_max = client.get("/novoJogo?quantidadeJog=11")
@@ -74,7 +74,7 @@ def test_estatisticas():
     assert response.status_code == 200
     assert response.json() == {"partidas_iniciadas": 2, "partidas_finalizadas": 0}
 
-### Testes de Fluxo de Jogo (GET)
+# Testes de Fluxo de Jogo
 
 def test_status_do_jogo():
     """Testa o endpoint de status."""
@@ -112,10 +112,10 @@ def test_ver_cartas_jogador_inexistente():
     response = client.get("/jogo/0/99") # Jogo 0, Jogador 99
     assert response.status_code == 404
     
-    # então o erro correto é "Jogador não encontrado"
+    
     assert response.json()["detail"] == "Jogador não encontrado"
 
-### Testes de Ações (PUT) - com Mock
+# Testes de Ações (PUT) - com Mock
 
 def test_jogar_carta_sucesso(monkeypatch):
     """Testa uma jogada válida."""
@@ -148,7 +148,7 @@ def test_jogar_carta_sucesso(monkeypatch):
 
 def test_jogar_carta_nao_e_a_vez():
     """Testa tentar jogar fora da vez."""
-    client.get("/novoJogo?quantidadeJog=2") # Jogo 0, vez do jogador 0
+    client.get("/novoJogo?quantidadeJog=2") 
     
     response = client.put("/jogo/0/jogar?id_jogador=1&id_carta=0")
     assert response.status_code == 403
@@ -234,4 +234,5 @@ def test_vitoria_e_jogo_terminado(monkeypatch):
     
     response_status = client.get("/jogo/0/status")
     assert response_status.status_code == 400
+
     assert "O jogo 0 já terminou" in response_status.json()["detail"]
