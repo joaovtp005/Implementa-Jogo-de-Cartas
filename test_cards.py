@@ -34,6 +34,5 @@ def test_baralho_embaralhado():
     """
     deck1 = create_deck()
     deck2 = create_deck()
-    
-    # É estatisticamente impossível serem idênticos se o shuffle funcionar
+
     assert deck1 != deck2

@@ -3,7 +3,6 @@ from typing import List, Optional, Dict
 from fastapi import HTTPException, status
 from pydantic import BaseModel, Field
 
-# Importações dos nossos outros arquivos
 from cards import Card
 from players import Player
 

@@ -2,7 +2,6 @@ import random
 from pydantic import BaseModel
 from typing import List
 
-# Cores e valores constantes
 COLORS = ['vermelho', 'azul', 'verde', 'amarelo']
 VALUES = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
 
