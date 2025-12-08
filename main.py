@@ -1,7 +1,4 @@
 from fastapi import FastAPI, HTTPException, status, Query
-
-from typing import List
-
 from cards import create_deck
 from players import Player
 import game 
@@ -17,7 +14,6 @@ def novo_jogo(quantidadeJog: int = Query(..., ge=2, le=10)):
     """
     game_id = game.storage.next_game_id
     
-    # 1. Cria o jogo
     new_deck = create_deck()
     players = [Player(id=i) for i in range(quantidadeJog)]
     
@@ -28,20 +24,16 @@ def novo_jogo(quantidadeJog: int = Query(..., ge=2, le=10)):
         current_player_id=0  
     )
     
-    # 2. Distribuir 5 cartas
     for i in range(INITIAL_HAND_SIZE):
         for player in new_game.players:
             player.hand.append(game.draw_card_from_deck(new_game))
             
-    # Carta inicial na mesa
     new_game.discard_pile.append(game.draw_card_from_deck(new_game))
     
-    # Salva no "banco de dados" do arquivo game.py
     game.storage.save_game(new_game)
     
     return {"id_jogo": game_id}
 
-# Parte 2: Verificar Status do Jogo
 
 @app.get("/jogo/{id_jogo}/status")
 def status_do_jogo(id_jogo: int):
@@ -66,7 +58,6 @@ def ver_cartas(id_jogo: int, id_jogador: int):
         
     return {"hand": current_game.players[id_jogador].hand}
 
-# Parte 3: Rodada
 
 @app.put("/jogo/{id_jogo}/jogar")
 def jogar_carta(id_jogo: int, id_jogador: int, id_carta: int = Query(..., ge=0)):
