@@ -54,7 +54,6 @@ class GameStorage:
 
 storage = GameStorage()
 
-# --- Funções Lógicas ---
 
 def draw_card_from_deck(game: Game) -> Card:
     """Compra uma carta do baralho, reembaralhando a pilha de descarte se necessário."""

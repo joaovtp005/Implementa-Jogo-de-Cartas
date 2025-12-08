@@ -1,5 +1,4 @@
 from fastapi import FastAPI, HTTPException, status, Query
-from typing import List
 from cards import create_deck
 from players import Player
 import game 
@@ -15,7 +14,6 @@ def novo_jogo(quantidadeJog: int = Query(..., ge=2, le=10)):
     """
     game_id = game.storage.next_game_id
     
-    # 1. Cria o jogo
     new_deck = create_deck()
     players = [Player(id=i) for i in range(quantidadeJog)]
     
