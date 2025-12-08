@@ -7,6 +7,7 @@ from players import Player
 import game 
 
 app = FastAPI(title="API de Jogo de Cartas")
+INITIAL_HAND_SIZE = 5
 
 @app.get("/novoJogo", status_code=status.HTTP_201_CREATED)
 def novo_jogo(quantidadeJog: int = Query(..., ge=2, le=10)):
@@ -14,8 +15,7 @@ def novo_jogo(quantidadeJog: int = Query(..., ge=2, le=10)):
     Inicia um novo jogo para 'quantidadeJog' jogadores.
     Distribui 5 cartas para cada e retorna o ID do jogo.
     """
-    game_id = game.next_game_id
-    game.next_game_id += 1
+    game_id = game.storage.next_game_id
     
     # 1. Cria o jogo
     new_deck = create_deck()
@@ -29,7 +29,7 @@ def novo_jogo(quantidadeJog: int = Query(..., ge=2, le=10)):
     )
     
     # 2. Distribuir 5 cartas
-    for _ in range(5):
+    for i in range(INITIAL_HAND_SIZE):
         for player in new_game.players:
             player.hand.append(game.draw_card_from_deck(new_game))
             
@@ -37,7 +37,7 @@ def novo_jogo(quantidadeJog: int = Query(..., ge=2, le=10)):
     new_game.discard_pile.append(game.draw_card_from_deck(new_game))
     
     # Salva no "banco de dados" do arquivo game.py
-    game.games_db[game_id] = new_game
+    game.storage.save_game(new_game)
     
     return {"id_jogo": game_id}
 
@@ -45,7 +45,7 @@ def novo_jogo(quantidadeJog: int = Query(..., ge=2, le=10)):
 
 @app.get("/jogo/{id_jogo}/status")
 def status_do_jogo(id_jogo: int):
-    current_game = game.get_game(id_jogo)
+    current_game = game.storage.get_game(id_jogo)
     return {
         "jogador_da_vez": current_game.current_player_id,
         "carta_no_topo": current_game.discard_pile[-1],
@@ -54,12 +54,12 @@ def status_do_jogo(id_jogo: int):
 
 @app.get("/jogo/{id_jogo}/jogador_da_vez")
 def jogador_da_vez(id_jogo: int):
-    current_game = game.get_game(id_jogo)
+    current_game = game.storage.get_game(id_jogo)
     return {"jogador_da_vez": current_game.current_player_id}
 
 @app.get("/jogo/{id_jogo}/{id_jogador}")
 def ver_cartas(id_jogo: int, id_jogador: int):
-    current_game = game.get_game(id_jogo)
+    current_game = game.storage.get_game(id_jogo)
     
     if id_jogador < 0 or id_jogador >= len(current_game.players):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Jogador não encontrado")
@@ -70,7 +70,7 @@ def ver_cartas(id_jogo: int, id_jogador: int):
 
 @app.put("/jogo/{id_jogo}/jogar")
 def jogar_carta(id_jogo: int, id_jogador: int, id_carta: int = Query(..., ge=0)):
-    current_game = game.get_game(id_jogo)
+    current_game = game.storage.get_game(id_jogo)
     
     if id_jogador != current_game.current_player_id:
         raise HTTPException(
@@ -109,7 +109,7 @@ def jogar_carta(id_jogo: int, id_jogador: int, id_carta: int = Query(..., ge=0))
 
 @app.put("/jogo/{id_jogo}/passa")
 def passar_a_vez(id_jogo: int, id_jogador: int):
-    current_game = game.get_game(id_jogo)
+    current_game = game.storage.get_game(id_jogo)
     
     if id_jogador != current_game.current_player_id:
         raise HTTPException(

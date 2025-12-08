@@ -16,9 +16,44 @@ class Game(BaseModel):
     game_over: bool = False
     winner: Optional[int] = None
 
-# --- Banco de Dados em Memória ---
-games_db: Dict[int, Game] = {}
-next_game_id: int = 0
+
+class GameStorage:
+    """Armazenamento simples sem variáveis globais"""
+    def __init__(self):
+        self._games = {}
+        self._next_id = 0
+    
+    @property
+    def games_db(self):
+        return self._games
+    
+    @property
+    def next_game_id(self):
+        current = self._next_id
+        self._next_id += 1
+        return current
+    
+    def get_game(self, id_jogo: int) -> Game:
+        """Busca um jogo ou lança erro 404"""
+        game = self._games.get(id_jogo)
+        if not game:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Jogo não encontrado")
+        if game.game_over:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, 
+                detail=f"O jogo {id_jogo} já terminou. Vencedor: Jogador {game.winner}"
+            )
+        return game
+    
+    def save_game(self, game: Game) -> None:
+        """Salva um jogo no armazenamento"""
+        self._games[game.id_jogo] = game
+        
+    def update_game_state(self, game: Game) -> None:
+        """Atualiza o estado de um jogo no armazenamento"""
+        self._games[game.id_jogo] = game
+
+storage = GameStorage()
 
 # --- Funções Lógicas ---
 
@@ -37,15 +72,3 @@ def draw_card_from_deck(game: Game) -> Card:
              raise HTTPException(status_code=500, detail="O jogo empatou! Não há mais cartas para comprar.")
              
     return game.deck.pop()
-
-def get_game(id_jogo: int) -> Game:
-    """Função auxiliar para buscar um jogo ou lançar um erro 404."""
-    game = games_db.get(id_jogo)
-    if not game:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Jogo não encontrado")
-    if game.game_over:
-         raise HTTPException(
-             status_code=status.HTTP_400_BAD_REQUEST, 
-             detail=f"O jogo {id_jogo} já terminou. Vencedor: Jogador {game.winner}"
-         )
-    return game
